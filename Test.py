@@ -1,31 +1,39 @@
 import streamlit as st
+from memory_utils import load_memory, save_memory, BASE_GOAL
+from food_form import food_form
+from deduct_form import deduct_form
+from food_list import food_list
+from calorie_gauge import calorie_gauge
+
+# Initialize session state from memory
+if "foods" not in st.session_state:
+    mem = load_memory()
+    st.session_state["foods"] = mem.get("foods", [])
+    st.session_state["total_eaten"] = mem.get("total_eaten", 0)
+    st.session_state["total_burned"] = mem.get("total_burned", 0)
+    st.session_state["total_remaining"] = mem.get("total_remaining", BASE_GOAL)
+
+def persist_state():
+    foods = st.session_state["foods"]
+    total_eaten = sum(c for _, c in foods if c > 0)
+    total_burned = -sum(c for _, c in foods if c < 0)
+    total_remaining = BASE_GOAL - total_eaten + total_burned
+    st.session_state["total_eaten"] = total_eaten
+    st.session_state["total_burned"] = total_burned
+    st.session_state["total_remaining"] = total_remaining
+    save_memory()
 
 st.title("Simple Calorie Counter")
 
-if "foods" not in st.session_state:
-    st.session_state["foods"] = []
-    st.session_state["total_calories"] = 0
+col1, col2 = st.columns([2, 1])
 
-food = st.text_input("Food name")
-calories = st.number_input("Calories", min_value=0, step=1)
+with col1:
+    food_form()
+    deduct_form()
+    st.subheader("Foods Added / Calories Adjusted:")
+    food_list()
 
-if st.button("Add Food"):
-    if food and calories > 0:
-        st.session_state["foods"].append((food, calories))
-        st.session_state["total_calories"] += calories
+with col2:
+    calorie_gauge(BASE_GOAL)
 
-# Deduct calories section
-st.subheader("Deduct Calories")
-deduct_reason = st.text_input("Reason for deduction (e.g., exercise)")
-deduct_calories = st.number_input("Calories to deduct", min_value=0, step=1, key="deduct")
-
-if st.button("Deduct"):
-    if deduct_reason and deduct_calories > 0:
-        st.session_state["foods"].append((f"Deducted: {deduct_reason}", -deduct_calories))
-        st.session_state["total_calories"] -= deduct_calories
-
-st.subheader("Foods Added / Calories Adjusted:")
-for f, c in st.session_state["foods"]:
-    st.write(f"{f}: {c} kcal")
-
-st.subheader(f"Total Calories: {st.session_state['total_calories']} kcal")
+persist_state()
