@@ -1,0 +1,19 @@
+{
+  "foods": [
+    [
+      "Apple x1",
+      1
+    ],
+    [
+      "Apple x1",
+      1
+    ],
+    [
+      "Apple x1",
+      1
+    ]
+  ],
+  "total_eaten": 3,
+  "total_burned": 0,
+  "total_remaining": 1697
+}

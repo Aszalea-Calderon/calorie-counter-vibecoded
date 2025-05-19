@@ -2,7 +2,8 @@ import streamlit as st
 import json
 import os
 
-COMMON_FOODS_PATH = os.path.join(os.path.dirname(__file__), "..", "common_foods.json")
+# Update path to point to the memory folder
+COMMON_FOODS_PATH = os.path.join(os.path.dirname(__file__), "memory", "common_foods.json")
 
 def load_common_foods():
     if not os.path.exists(COMMON_FOODS_PATH):
@@ -37,7 +38,6 @@ def food_form():
             key="food_input"
         )
 
-        # If user types a new food, show "Add new Food"
         if food_input == "Add new Food":
             st.session_state["adding_new_food"] = True
             new_food_name = st.text_input("Enter new food name", value=st.session_state["pending_food"], key="new_food_name")
@@ -47,12 +47,9 @@ def food_form():
             st.markdown(f"Total calories: **{total_calories}**")
             add_food = st.form_submit_button("Add Food")
             if add_food and new_food_name and calories_per_unit > 0 and quantity > 0:
-                # Add to persistent foods
                 st.session_state["common_foods"][new_food_name] = calories_per_unit
                 save_common_foods(st.session_state["common_foods"])
-                # Add to today's foods
                 st.session_state["foods"].append((f"{new_food_name} x{quantity}", total_calories))
-                # Reset
                 st.session_state["pending_food"] = ""
                 st.session_state["pending_calories"] = 0
                 st.session_state["pending_quantity"] = 1

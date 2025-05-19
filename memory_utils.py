@@ -3,7 +3,7 @@ import json
 import streamlit as st
 
 BASE_GOAL = 1700
-MEMORY_FILE = os.path.join(os.path.dirname(__file__), "calorie_memory.json")
+MEMORY_FILE = os.path.join(os.path.dirname(__file__), "memory", "calorie_memory.json")
 
 def load_memory():
     if not os.path.exists(MEMORY_FILE):
